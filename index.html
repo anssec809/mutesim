@@ -3,12 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#fafaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121514" media="(prefers-color-scheme: dark)">
 <title>ミュートシミュレーター</title>
 <style>
-:root{--bg:#fafaf7;--card:#fff;--line:#e4e4de;--fg:#1c1f1d;--sub:#6b7270;--acc:#0e8f7e;--accfg:#fff;--warn:#c8462f;
+:root{--bg:#fafaf7;--card:#fff;--line:#e4e4de;--fg:#1c1f1d;--sub:#6b7270;--acc:#0e8f7e;--accfg:#fff;--warn:#c8462f;color-scheme:light;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121514;--card:#1a1e1c;--line:#2b312e;--fg:#e9ece9;--sub:#8e9692;--acc:#3fc2ae;--accfg:#06201b;--warn:#ee7b63}}
-:root[data-theme="dark"]{--bg:#121514;--card:#1a1e1c;--line:#2b312e;--fg:#e9ece9;--sub:#8e9692;--acc:#3fc2ae;--accfg:#06201b;--warn:#ee7b63}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#121514;--card:#1a1e1c;--line:#2b312e;--fg:#e9ece9;--sub:#8e9692;--acc:#3fc2ae;--accfg:#06201b;--warn:#ee7b63}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#121514;--card:#1a1e1c;--line:#2b312e;--fg:#e9ece9;--sub:#8e9692;--acc:#3fc2ae;--accfg:#06201b;--warn:#ee7b63}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font-family:"Hiragino Sans","Noto Sans JP","Yu Gothic",system-ui,sans-serif;line-height:1.65}
@@ -23,7 +26,8 @@ header h1{font-size:16px;margin:0;font-weight:700}
 #newbar[hidden]{display:none}
 .tw{position:relative;display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--bg);transition:max-height .35s ease,opacity .3s ease,padding .35s ease}
 .tw.out{max-height:0!important;opacity:0;padding-top:0;padding-bottom:0;border-bottom-width:0;overflow:hidden}
-.av{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:18px}
+.av{flex:none;position:relative;overflow:hidden;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:18px}
+.av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:var(--card)}
 .body{min-width:0;flex:1}
 .hd{display:flex;gap:6px;align-items:baseline;font-size:14.5px}
 .hd .nm{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -32,6 +36,8 @@ header h1{font-size:16px;margin:0;font-weight:700}
 .more:hover,.more:focus-visible{background:var(--line);color:var(--fg)}
 .tx{margin:2px 0 8px;font-size:15.5px;overflow-wrap:anywhere;white-space:pre-wrap}
 .mn{color:var(--acc)}
+.pic{display:block;width:100%;max-height:380px;object-fit:cover;border:1px solid var(--line);border-radius:14px;margin:0 0 8px;background:var(--card)}
+.qt .pic{max-height:220px;margin:8px 0 0;border-radius:10px}
 .qt{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:2px 0 8px}
 .qh{display:flex;gap:6px;align-items:center;font-size:13.5px;min-width:0}
 .qh .av{width:20px;height:20px;font-size:11px}
@@ -55,12 +61,19 @@ header h1{font-size:16px;margin:0;font-weight:700}
 .dlg .lead{margin:0 0 14px;font-size:16.5px;font-weight:700}
 .dlg ul{margin:0 0 20px;padding-left:1.2em;font-size:13.5px;color:var(--sub)}
 .dlg li{margin-bottom:4px}
+.shr{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 22px}
+.shr .b{display:inline-flex;align-items:center;width:auto;margin:0;padding:9px 14px;background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:999px;font:inherit;font-size:13.5px;font-weight:600;text-decoration:none;cursor:pointer}
+.shr .b:hover{border-color:var(--acc);color:var(--acc)}
 .empty{padding:48px 24px;text-align:center;color:var(--sub)}
 .res{padding:32px 20px 24px}
 .res .lead{color:var(--sub);font-size:14px;margin:0}
 .res h2{font-size:26px;line-height:1.35;margin:4px 0 12px}
 .res p{margin:0 0 18px}
-.meter{height:10px;border-radius:99px;background:var(--line);overflow:hidden;margin:6px 0 4px}
+.meter{position:relative;height:10px;border-radius:99px;background:var(--line);overflow:hidden;margin:6px 0 4px}
+.meter u{position:absolute;top:0;bottom:0;width:2px;background:var(--fg);opacity:.7;text-decoration:none}
+.grp{display:grid;grid-template-columns:8.5em 1fr 4.5em;gap:8px;align-items:center;font-size:13px;margin:6px 0}
+.grp .meter{margin:0;height:8px}
+.grp span:last-child{text-align:right;color:var(--sub)}
 .meter i{display:block;height:100%;background:var(--acc)}
 .small{font-size:13px;color:var(--sub)}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 24px}
@@ -93,8 +106,8 @@ header h1{font-size:16px;margin:0;font-weight:700}
 </div>
 
 <script>
+{const th=new URLSearchParams(location.search).get("theme");if(th==="dark"||th==="light")document.documentElement.dataset.theme=th}
 const PRAISE=["ナイスミュート！心の平和を守れました","いい判断です。あなたのTLはあなたのもの","すっきり！視界がクリアになりました","自分の心地よさを優先できるの、えらい","ミュートは逃げじゃなくて整理整頓です","TLがちょっと軽くなりました","ストレスの種をひとつ減らしました","TLが少しずつあなたの形になってきました"];
-const QT={"静穏":{title:"ひだまりの縁側TL",text:"静かで穏やかな投稿がゆっくり流れる、落ち着いたTLです。"},"動穏":{title:"好きで盛り上がる広場TL",text:"熱量は高め、でも角は立たない。好きなものに囲まれたTLです。"},"静辛":{title:"深夜の本音TL",text:"静かだけれど、ちょっとビターな言葉が混ざる、味わい深いTLです。"},"動辛":{title:"なんでも来いの大通りTL",text:"にぎやかで刺激もたっぷり。いろんな声を受け止めるタフなTLです。"}};
 
 const $=id=>document.getElementById(id);
 const feed=$("feed"),stat=$("stat"),toast=$("toast"),main=$("main"),bar=$("bar"),intro=$("intro");
@@ -102,22 +115,27 @@ let U=[],muted=new Set(),queue=[],pend=[],timer=null,tt=null;
 const nb=document.createElement("button");nb.id="newbar";nb.hidden=true;nb.onclick=()=>flush();
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const col=u=>`hsl(${Math.abs([...u.h].reduce((a,ch)=>a*31+ch.charCodeAt(0)|0,7))%360} 42% 42%)`;
+const avh=u=>`<span class="av" style="background:${col(u)}">${esc(ini(u.n))}${u.icon?`<img src="${esc(u.icon)}" alt="">`:""}</span>`;
+const picH=t=>t.img?`<img class="pic" src="${esc(t.img)}" alt="${esc(t.alt||"")}" loading="lazy">`:"";
+const fmt=s=>esc(s).replace(/(https?:\/\/[^\s<]+|#[^\s#<、。！？!?]+)/g,'<span class="mn">$1</span>');
+const fixImgs=r=>r.querySelectorAll("img").forEach(im=>im.addEventListener("error",()=>im.remove()));
 const ini=n=>n.replace(/[^\p{L}\p{N}]/gu,"").charAt(0)||"?";
 const rnd=a=>a[Math.floor(Math.random()*a.length)];
 const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const alive=()=>U.filter(u=>!muted.has(u.h));
 const refill=()=>{queue=shuffle(alive().flatMap(u=>u.t.map(x=>({u,x}))))};
 
-function quoteOf(q){const v=U.find(w=>w.h===q.h),t=v&&v.t[q.i];return t?{u:v,x:t.x}:null}
+function quoteOf(q){const v=U.find(w=>w.h===q.h),t=v&&v.t[q.i];return t?{u:v,x:t.x,img:t.img,alt:t.alt}:null}
 function card(u,t){
   const d=document.createElement("article");d.className="tw";d.dataset.h=u.h;
   const qd=t.q&&quoteOf(t.q);
-  const quote=qd?`<div class="qt"><div class="qh"><span class="av" style="background:${col(qd.u)}">${esc(ini(qd.u.n))}</span><span class="nm">${esc(qd.u.n)}</span><span class="id">@${esc(qd.u.h)}</span></div><p class="tx">${esc(qd.x)}</p></div>`:"";
+  const quote=qd?`<div class="qt"><div class="qh">${avh(qd.u)}<span class="nm">${esc(qd.u.n)}</span><span class="id">@${esc(qd.u.h)}</span></div><p class="tx">${fmt(qd.x)}</p>${picH(qd)}</div>`:"";
   const head=t.r?`<span class="mn">@${esc(t.r)}</span> `:"";
-  d.innerHTML=`<div class="av" style="background:${col(u)}">${esc(ini(u.n))}</div>
+  d.innerHTML=`${avh(u)}
   <div class="body"><div class="hd"><span class="nm">${esc(u.n)}</span><span class="id">@${esc(u.h)}</span>
-  <button class="more" aria-label="メニュー">⋯</button></div><p class="tx">${head}${esc(t.x)}</p>${quote}
+  <button class="more" aria-label="メニュー">⋯</button></div><p class="tx">${head}${fmt(t.x)}</p>${picH(t)}${quote}
   <div class="ac"><span>💬 ${Math.floor(Math.random()*40)}</span><span>🔁 ${Math.floor(Math.random()*90)}</span><span>♡ ${Math.floor(Math.random()*400)}</span></div></div>`;
+  fixImgs(d);
   return d;
 }
 function upd(){nb.hidden=!pend.length;nb.textContent=`${pend.length}件の新しい投稿を表示`}
@@ -162,21 +180,45 @@ function start(){
   window.scrollTo(0,0);
 }
 function begin(){clearInterval(timer);timer=setInterval(push,4500)}
+const GROUPS=["癒やし・まったり","趣味・推し・日常","愚痴・ぼやき","自慢・マウント","説教・ご意見番","煽り・炎上","宣伝・勧誘","政治っぽい"];
+const GT={"癒やし・まったり":["ほっこり縁側TL","猫や食事や山の静けさ。ゆったりした時間が流れるTLです。"],"趣味・推し・日常":["好きなものに囲まれたTL","趣味や推しの話が中心の、にぎやかな日常TLです。"],"愚痴・ぼやき":["居酒屋カウンターTL","ぼやきや愚痴が飛び交う、共感でつながるTLです。"],"自慢・マウント":["ドヤ顔博覧会TL","自慢と上から目線が並ぶ、向上心にあふれたTLです。"],"説教・ご意見番":["お説教部屋TL","ご意見番がそこら中にいる、背筋の伸びるTLです。"],"煽り・炎上":["ゴングが鳴りやまないTL","煽りと炎上の気配が絶えない、スリル満点のTLです。"],"宣伝・勧誘":["商店街の呼び込みTL","拡散のお願いと勧誘が飛び交う、にぎやかなTLです。"],"政治っぽい":["討論番組の控え室TL","強い口調の意見が並ぶ、主張の強いTLです。"]};
+const MIX=[[["凪の湖TL","静かで穏やかな投稿だけが、ゆっくり流れるTLです。"],["穏やかな日常TL","ほどよい話題が、角を立てずに流れるTLです。"],["好きで盛り上がる広場TL","熱量は高いのに角が立たない、気持ちのいいTLです。"]],[["ほろ苦い夜更かしTL","静かな中に、少しビターな言葉が混じるTLです。"],["ほどよく刺激的なTL","穏やかさと刺激がバランスよく混ざったTLです。"],["活気ある駅前TL","にぎやかで、ときどきピリッとするTLです。"]],[["深夜の本音TL","静かだけれど、辛口の言葉が多いTLです。"],["辛口ワイドショーTL","刺激的な話題が、淡々と続くTLです。"],["なんでも来いの大通りTL","にぎやかで刺激もたっぷり。いろんな声を受け止めるタフなTLです。"]]];
+const gOf=u=>u.g||"その他";
+const avg=(a,f)=>a.length?a.reduce((s,u)=>s+f(u),0)/a.length:0;
 function finish(){
   clearInterval(timer);bar.style.display="none";toast.classList.remove("on");
-  const left=alive();let h;
-  if(!left.length){
-    h=`<p class="lead">あなたが作ったのは…</p><h2>静寂のTL</h2><p>全員をミュートしました。何も流れてこない、究極の平穏です。</p>`;
-  }else{
-    const V=left.reduce((s,u)=>s+u.v,0)/left.length,E=left.reduce((s,u)=>s+u.d*3/5,0)/left.length;
-    const T=QT[(V>=1.5?"動":"静")+(E>=1.2?"辛":"穏")],pv=Math.round(V/3*100),pe=Math.round(E/3*100);
-    h=`<p class="lead">あなたが作ったのは…</p><h2>${T.title}</h2><p>${T.text}</p>
-    <div class="small">にぎやかさ ${pv}%</div><div class="meter"><i style="width:${pv}%"></i></div>
-    <div class="small">刺激度 ${pe}%</div><div class="meter"><i style="width:${pe}%"></i></div>
-    <p class="small">どんなTLも、選んだ本人にとっての正解です。</p>
-    <div class="small">残ったユーザー</div><div class="chips">${left.map(u=>`<span class="chip"><span class="av" style="background:${col(u)}">${esc(ini(u.n))}</span>${esc(u.n)}</span>`).join("")}</div>`;
-  }
-  main.innerHTML=`<div class="res">${h}<p class="small">ミュートした人：${muted.size}人 ／ 残した人：${left.length}人</p><button id="again">もう一度遊ぶ</button></div>`;
+  const left=alive(),n=left.length;
+  const V=avg(left,u=>u.v),E=avg(left,u=>u.d),V0=avg(U,u=>u.v),E0=avg(U,u=>u.d);
+  const pv=Math.round(V/3*100),pe=Math.round(E/5*100),pv0=Math.round(V0/3*100),pe0=Math.round(E0/5*100);
+  const gs={};U.forEach(u=>{const g=gOf(u);(gs[g]=gs[g]||{t:0,k:0}).t++});left.forEach(u=>gs[gOf(u)].k++);
+  const names=[...GROUPS.filter(g=>gs[g]),...Object.keys(gs).filter(g=>!GROUPS.includes(g))];
+  const top=[...names].sort((a,b)=>gs[b].k-gs[a].k)[0];
+  let T;
+  if(!n)T=["静寂のTL","全員をミュートしました。何も流れてこない、究極の平穏です。"];
+  else if(muted.size<=2)T=["来る者拒まずTL","ほとんど誰もミュートしませんでした。いろんな声が混ざる、懐の深いTLです。"];
+  else if(n<=3)T=["少数精鋭TL",`残したのは${n}人だけ。選び抜いたメンバーのTLです。`];
+  else if(gs[top].k/n>=.5&&GT[top])T=GT[top];
+  else T=MIX[E<1.4?0:E<2.4?1:2][V<1.4?0:V<2.0?1:2];
+  const dlt=(a,b)=>{const x=a-b;return Math.abs(x)<3?"最初のTLとほぼ同じ":`最初のTLより${Math.abs(x)}pt${x<0?"低い":"高い"}`};
+  const meters=n?`<div class="small">にぎやかさ ${pv}%（${dlt(pv,pv0)}）</div><div class="meter"><i style="width:${pv}%"></i><u style="left:${pv0}%"></u></div>
+    <div class="small">刺激度 ${pe}%（${dlt(pe,pe0)}）</div><div class="meter"><i style="width:${pe}%"></i><u style="left:${pe0}%"></u></div>
+    <p class="small">縦線は、ミュートする前の最初のTLの位置です。</p>`:"";
+  const rows=names.map(g=>`<div class="grp"><span>${esc(g)}</span><div class="meter"><i style="width:${gs[g].k/gs[g].t*100}%"></i></div><span>${gs[g].k}/${gs[g].t}人</span></div>`).join("");
+  const allM=names.filter(g=>gs[g].t>=2&&gs[g].k===0),allK=names.filter(g=>gs[g].t>=2&&gs[g].k===gs[g].t);
+  const notes=[allM.length?`全員ミュートした系統：${allM.join("、")}`:"",allK.length?`全員残した系統：${allK.join("、")}`:""].filter(Boolean).map(t=>`<p class="small" style="margin:6px 0">${esc(t)}</p>`).join("");
+  const base=/^https?:$/.test(location.protocol)?location.origin+location.pathname:"";
+  const tag="ミュートシミュレーター",stxt=`ミュートシミュレーターで「${T[0]}」を作りました！`+(n?`\nにぎやかさ ${pv}% ／ 刺激度 ${pe}%`:"");
+  const xUrl=`https://x.com/intent/tweet?text=${encodeURIComponent(stxt)}${base?`&url=${encodeURIComponent(base)}`:""}&hashtags=${encodeURIComponent(tag)}`;
+  const lUrl=base?`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(base)}&text=${encodeURIComponent(stxt)}`:"";
+  const share=`<div class="small" style="margin-top:18px">結果を共有する</div><div class="shr"><a class="b" href="${esc(xUrl)}" target="_blank" rel="noopener noreferrer">Xで共有</a>${lUrl?`<a class="b" href="${esc(lUrl)}" target="_blank" rel="noopener noreferrer">LINEで共有</a>`:""}${navigator.share?`<button class="b" id="shNative">その他で共有</button>`:""}<button class="b" id="shCopy">テキストをコピー</button></div>`;
+  const chips=n?`<div class="small" style="margin-top:18px">残ったユーザー</div><div class="chips">${left.map(u=>`<span class="chip">${avh(u)}${esc(u.n)}</span>`).join("")}</div>`:"";
+  main.innerHTML=`<div class="res"><p class="lead">あなたが作ったのは…</p><h2>${esc(T[0])}</h2><p>${esc(T[1])}</p>${meters}
+    <div class="small" style="margin-top:18px">系統ごとの内訳（残した人数／全体）</div>${rows}${notes}
+    <p class="small" style="margin-top:14px">どんなTLも、選んだ本人にとっての正解です。</p>${chips}
+    <p class="small">ミュートした人：${muted.size}人 ／ 残した人：${n}人</p>${share}<button id="again">もう一度遊ぶ</button></div>`;
+  fixImgs(main);
+  $("shCopy").onclick=async()=>{try{await navigator.clipboard.writeText(stxt+(base?"\n"+base:"")+"\n#"+tag);say("コピーしました","共有用のテキストをクリップボードに入れました")}catch{say("コピーできませんでした","手動で選択してコピーしてください")}};
+  if($("shNative"))$("shNative").onclick=()=>navigator.share({text:stxt,url:base||undefined}).catch(()=>{});
   $("again").onclick=()=>{start();begin()};window.scrollTo(0,0);
 }
 $("done").onclick=finish;
