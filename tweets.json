@@ -1,14 +1,14 @@
 [
-{"h":"hinata_neko","n":"ひなたの猫日記","icon":"icons/hinata_neko.jpg","tag":"猫","v":1,"d":0,"g":"癒やし・まったり","t":[
+{"h":"hinata_neko","n":"ひなたの猫日記","icon":"icon/hinata_neko.jpg","tag":"猫","v":1,"d":0,"g":"癒やし・まったり","t":[
   "ちくわが\nひざのうえで\nねてる あたたかいなの",
      {
       "x":"むぎが ごはんまだかって せかしてる",
-      "img":"images/mugi.jpg"
+      "img":"image/mugi.jpg"
     },
     "ふたりで\nソファで\nぎゅうぎゅうにねてる(´-`)",
     {
       "x":"しっぽが ゆらゆらしてる ちくわの おもしろいな",
-      "img":"images/tikuwa.jpg"
+      "img":"image/tikuwa.jpg"
     },
   "よるになっても むぎが あそんでる ねむれない",
   "かえってきたら ドアのところ ちくわが まってた",
@@ -30,25 +30,27 @@
   "t": [
     {
       "x": "豚バラ角煮を小分け冷凍。計420円。",
-      "img": "images/butabara.jpg"
+      "img": "image/butabara.jpg"
     },
     {
       "x": "キャベツ塩もみ保存。120円で大量消費。",
-      "img": "images/kyabetu.jpg"
+      "img": "image/kyabetu.jpg"
     },
     {
       "x": "卵焼き多めに焼いた。朝の備え。",
-      "img": "images/tamago.jpg"
+      "img": "image/tamago.jpg"
     },
     {
       "x": "大根人参の煮物。放置で火通す。",
-      "img": "images/daikon.jpg"
+      "img": "image/daikon.jpg"
     },
     {
       "x": "米3合雑穀混ぜ。これで3日持つ。",
-      "img": "images/zakkoku.jpg"
+      "img": "image/zakkoku.jpg"
     },
-    "豆腐わかめ味噌汁。冷凍OK。",
+     {
+      "x":"豆腐わかめ味噌汁。冷凍OK。","img": "image/misosiru.jpg"
+    },
     "鮭塩焼き。骨取りが地味に手間。",
     "仕事資料で夜更かし。眠い。",
     "電車遅延で帰宅遅れ。買い出し中止。",
