@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ミュートシミュレーター</title>
+<style>
+:root{--bg:#fafaf7;--card:#fff;--line:#e4e4de;--fg:#1c1f1d;--sub:#6b7270;--acc:#0e8f7e;--accfg:#fff;--warn:#c8462f;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121514;--card:#1a1e1c;--line:#2b312e;--fg:#e9ece9;--sub:#8e9692;--acc:#3fc2ae;--accfg:#06201b;--warn:#ee7b63}}
+:root[data-theme="dark"]{--bg:#121514;--card:#1a1e1c;--line:#2b312e;--fg:#e9ece9;--sub:#8e9692;--acc:#3fc2ae;--accfg:#06201b;--warn:#ee7b63}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Hiragino Sans","Noto Sans JP","Yu Gothic",system-ui,sans-serif;line-height:1.65}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+.wrap{max-width:600px;margin:0 auto;border-left:1px solid var(--line);border-right:1px solid var(--line);min-height:100vh;padding-bottom:110px;background:var(--bg)}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--bg);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+header h1{font-size:16px;margin:0;font-weight:700}
+.stat{font-size:12.5px;color:var(--sub);text-align:right;white-space:nowrap}
+.stat b{color:var(--fg)}
+.note{margin:0;padding:6px 16px;font-size:11.5px;color:var(--sub);border-bottom:1px solid var(--line)}
+#newbar{display:block;width:100%;border:0;border-bottom:1px solid var(--line);background:var(--card);color:var(--acc);font:inherit;font-weight:700;font-size:14.5px;padding:12px;cursor:pointer;position:sticky;top:calc(env(safe-area-inset-top,0px) + 49px);z-index:8}
+#newbar[hidden]{display:none}
+.tw{position:relative;display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--bg);transition:max-height .35s ease,opacity .3s ease,padding .35s ease}
+.tw.out{max-height:0!important;opacity:0;padding-top:0;padding-bottom:0;border-bottom-width:0;overflow:hidden}
+.av{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:18px}
+.body{min-width:0;flex:1}
+.hd{display:flex;gap:6px;align-items:baseline;font-size:14.5px}
+.hd .nm{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hd .id{color:var(--sub);font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.more{margin-left:auto;background:none;border:0;color:var(--sub);font-size:18px;line-height:1;padding:2px 8px;border-radius:999px;cursor:pointer}
+.more:hover,.more:focus-visible{background:var(--line);color:var(--fg)}
+.tx{margin:2px 0 8px;font-size:15.5px;overflow-wrap:anywhere;white-space:pre-wrap}
+.mn{color:var(--acc)}
+.qt{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:2px 0 8px}
+.qh{display:flex;gap:6px;align-items:center;font-size:13.5px;min-width:0}
+.qh .av{width:20px;height:20px;font-size:11px}
+.qh .nm{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qh .id{color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qt .tx{margin:4px 0 0;font-size:14.5px}
+.ac{display:flex;gap:28px;color:var(--sub);font-size:13px}
+.menu{position:absolute;right:14px;top:40px;z-index:5;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.18);padding:6px;min-width:210px}
+.menu button{display:block;width:100%;text-align:left;background:none;border:0;color:var(--fg);font:inherit;font-size:14.5px;padding:10px 12px;border-radius:8px;cursor:pointer}
+.menu button:hover,.menu button:focus-visible{background:var(--line)}
+.menu .mu{color:var(--warn);font-weight:700}
+.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 64px);transform:translate(-50%,-12px);background:var(--acc);color:var(--accfg);padding:10px 18px;border-radius:14px;font-size:14px;z-index:20;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;text-align:center;max-width:90vw}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.toast small{display:block;opacity:.85;font-size:12px}
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:9;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(transparent,var(--bg) 40%)}
+.bar button,.res button,.dlg button{display:block;margin:0 auto;width:min(100%,420px);background:var(--acc);color:var(--accfg);border:0;border-radius:999px;padding:13px;font:inherit;font-weight:700;font-size:15px;cursor:pointer}
+.ov{position:fixed;inset:0;z-index:30;display:grid;place-items:center;padding:20px;background:rgba(0,0,0,.5)}
+.ov[hidden]{display:none}
+.dlg{width:100%;max-width:420px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px 22px 22px;box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.dlg h2{margin:0 0 10px;font-size:22px;line-height:1.3}
+.dlg .lead{margin:0 0 14px;font-size:16.5px;font-weight:700}
+.dlg ul{margin:0 0 20px;padding-left:1.2em;font-size:13.5px;color:var(--sub)}
+.dlg li{margin-bottom:4px}
+.empty{padding:48px 24px;text-align:center;color:var(--sub)}
+.res{padding:32px 20px 24px}
+.res .lead{color:var(--sub);font-size:14px;margin:0}
+.res h2{font-size:26px;line-height:1.35;margin:4px 0 12px}
+.res p{margin:0 0 18px}
+.meter{height:10px;border-radius:99px;background:var(--line);overflow:hidden;margin:6px 0 4px}
+.meter i{display:block;height:100%;background:var(--acc)}
+.small{font-size:13px;color:var(--sub)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 24px}
+.chip{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:4px 12px 4px 4px;font-size:13px}
+.chip .av{width:26px;height:26px;font-size:12px}
+@media (prefers-reduced-motion:reduce){.tw,.toast{transition:none}}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><h1>ミュートシミュレーター</h1><div class="stat" id="stat"></div></header>
+<p class="note">※ すべてAIが作った架空の投稿です</p>
+<main id="main"><div id="feed"></div></main>
+</div>
+<div class="bar" id="bar"><button id="done">このTLで満足したので終了する</button></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="ov" id="intro" role="dialog" aria-modal="true" aria-labelledby="introTitle" hidden>
+  <div class="dlg">
+    <h2 id="introTitle">ミュートシミュレーター</h2>
+    <p class="lead">不快だと思ったユーザーをミュートして、理想のTLを作りましょう！</p>
+    <ul>
+      <li>投稿右上の「⋯」から、そのユーザーをミュートできます</li>
+      <li>正解や不正解はありません。好きなユーザーは残して大丈夫です</li>
+      <li>満足したら、画面下のボタンでいつでも終了できます</li>
+      <li>すべてAIが作った架空の投稿です</li>
+    </ul>
+    <button id="go">はじめる</button>
+  </div>
+</div>
+
+<script>
+const PRAISE=["ナイスミュート！心の平和を守れました","いい判断です。あなたのTLはあなたのもの","すっきり！視界がクリアになりました","自分の心地よさを優先できるの、えらい","ミュートは逃げじゃなくて整理整頓です","TLがちょっと軽くなりました","ストレスの種をひとつ減らしました","TLが少しずつあなたの形になってきました"];
+const QT={"静穏":{title:"ひだまりの縁側TL",text:"静かで穏やかな投稿がゆっくり流れる、落ち着いたTLです。"},"動穏":{title:"好きで盛り上がる広場TL",text:"熱量は高め、でも角は立たない。好きなものに囲まれたTLです。"},"静辛":{title:"深夜の本音TL",text:"静かだけれど、ちょっとビターな言葉が混ざる、味わい深いTLです。"},"動辛":{title:"なんでも来いの大通りTL",text:"にぎやかで刺激もたっぷり。いろんな声を受け止めるタフなTLです。"}};
+
+const $=id=>document.getElementById(id);
+const feed=$("feed"),stat=$("stat"),toast=$("toast"),main=$("main"),bar=$("bar"),intro=$("intro");
+let U=[],muted=new Set(),queue=[],pend=[],timer=null,tt=null;
+const nb=document.createElement("button");nb.id="newbar";nb.hidden=true;nb.onclick=()=>flush();
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const col=u=>`hsl(${Math.abs([...u.h].reduce((a,ch)=>a*31+ch.charCodeAt(0)|0,7))%360} 42% 42%)`;
+const ini=n=>n.replace(/[^\p{L}\p{N}]/gu,"").charAt(0)||"?";
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const alive=()=>U.filter(u=>!muted.has(u.h));
+const refill=()=>{queue=shuffle(alive().flatMap(u=>u.t.map(x=>({u,x}))))};
+
+function quoteOf(q){const v=U.find(w=>w.h===q.h),t=v&&v.t[q.i];return t?{u:v,x:t.x}:null}
+function card(u,t){
+  const d=document.createElement("article");d.className="tw";d.dataset.h=u.h;
+  const qd=t.q&&quoteOf(t.q);
+  const quote=qd?`<div class="qt"><div class="qh"><span class="av" style="background:${col(qd.u)}">${esc(ini(qd.u.n))}</span><span class="nm">${esc(qd.u.n)}</span><span class="id">@${esc(qd.u.h)}</span></div><p class="tx">${esc(qd.x)}</p></div>`:"";
+  const head=t.r?`<span class="mn">@${esc(t.r)}</span> `:"";
+  d.innerHTML=`<div class="av" style="background:${col(u)}">${esc(ini(u.n))}</div>
+  <div class="body"><div class="hd"><span class="nm">${esc(u.n)}</span><span class="id">@${esc(u.h)}</span>
+  <button class="more" aria-label="メニュー">⋯</button></div><p class="tx">${head}${esc(t.x)}</p>${quote}
+  <div class="ac"><span>💬 ${Math.floor(Math.random()*40)}</span><span>🔁 ${Math.floor(Math.random()*90)}</span><span>♡ ${Math.floor(Math.random()*400)}</span></div></div>`;
+  return d;
+}
+function upd(){nb.hidden=!pend.length;nb.textContent=`${pend.length}件の新しい投稿を表示`}
+function push(){
+  if(!queue.length)refill();
+  const it=queue.shift();if(it&&pend.length<30)pend.push(it);
+  upd();
+}
+function flush(){
+  document.querySelectorAll(".menu").forEach(m=>m.remove());
+  pend.forEach(it=>feed.prepend(card(it.u,it.x)));pend=[];
+  while(feed.children.length>60)feed.lastChild.remove();
+  upd();window.scrollTo({top:0});
+}
+function updStat(){stat.innerHTML=`ミュート <b>${muted.size}</b>人 ／ 残り <b>${U.length-muted.size}</b>人`}
+function say(a,b){toast.innerHTML=`${esc(a)}<small>${esc(b)}</small>`;toast.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>toast.classList.remove("on"),2600)}
+function mute(u){
+  muted.add(u.h);queue=queue.filter(i=>i.u.h!==u.h);pend=pend.filter(i=>i.u.h!==u.h);upd();
+  document.querySelectorAll(".menu").forEach(m=>m.remove());
+  document.querySelectorAll(`.tw[data-h="${CSS.escape(u.h)}"]`).forEach(e=>{
+    e.style.maxHeight=e.offsetHeight+"px";void e.offsetHeight;e.classList.add("out");setTimeout(()=>e.remove(),400);
+  });
+  updStat();say(rnd(PRAISE),`@${u.h} をミュートしました`);
+  if(!alive().length)setTimeout(finish,1400);
+}
+document.addEventListener("click",e=>{
+  const more=e.target.closest(".more"),had=document.querySelector(".menu");
+  if(had&&!e.target.closest(".menu"))had.remove();
+  if(!more||(had&&had.parentElement===more.closest(".tw")))return;
+  const c=more.closest(".tw"),u=U.find(x=>x.h===c.dataset.h);
+  const m=document.createElement("div");m.className="menu";
+  m.innerHTML=`<button class="mu">@${esc(u.h)} さんをミュート</button><button>閉じる</button>`;
+  m.firstChild.onclick=()=>mute(u);m.lastChild.onclick=()=>m.remove();
+  c.appendChild(m);
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")document.querySelectorAll(".menu").forEach(m=>m.remove())});
+
+function start(){
+  muted=new Set();queue=[];pend=[];feed.innerHTML="";main.innerHTML="";main.append(nb,feed);
+  bar.style.display="";updStat();refill();upd();
+  for(let i=0;i<8;i++){const it=queue.shift();feed.appendChild(card(it.u,it.x))}
+  window.scrollTo(0,0);
+}
+function begin(){clearInterval(timer);timer=setInterval(push,4500)}
+function finish(){
+  clearInterval(timer);bar.style.display="none";toast.classList.remove("on");
+  const left=alive();let h;
+  if(!left.length){
+    h=`<p class="lead">あなたが作ったのは…</p><h2>静寂のTL</h2><p>全員をミュートしました。何も流れてこない、究極の平穏です。</p>`;
+  }else{
+    const V=left.reduce((s,u)=>s+u.v,0)/left.length,E=left.reduce((s,u)=>s+u.d*3/5,0)/left.length;
+    const T=QT[(V>=1.5?"動":"静")+(E>=1.2?"辛":"穏")],pv=Math.round(V/3*100),pe=Math.round(E/3*100);
+    h=`<p class="lead">あなたが作ったのは…</p><h2>${T.title}</h2><p>${T.text}</p>
+    <div class="small">にぎやかさ ${pv}%</div><div class="meter"><i style="width:${pv}%"></i></div>
+    <div class="small">刺激度 ${pe}%</div><div class="meter"><i style="width:${pe}%"></i></div>
+    <p class="small">どんなTLも、選んだ本人にとっての正解です。</p>
+    <div class="small">残ったユーザー</div><div class="chips">${left.map(u=>`<span class="chip"><span class="av" style="background:${col(u)}">${esc(ini(u.n))}</span>${esc(u.n)}</span>`).join("")}</div>`;
+  }
+  main.innerHTML=`<div class="res">${h}<p class="small">ミュートした人：${muted.size}人 ／ 残した人：${left.length}人</p><button id="again">もう一度遊ぶ</button></div>`;
+  $("again").onclick=()=>{start();begin()};window.scrollTo(0,0);
+}
+$("done").onclick=finish;
+$("go").onclick=()=>{intro.hidden=true;begin()};
+
+fetch("tweets.json").then(r=>{if(!r.ok)throw 0;return r.json()}).then(d=>{
+  if(!Array.isArray(d)||!d.length)throw 0;
+  U=d;U.forEach(u=>{u.t=u.t.map(t=>typeof t==="string"?{x:t}:t)});start();intro.hidden=false;$("go").focus();
+}).catch(()=>{
+  bar.style.display="none";
+  main.innerHTML=`<div class="empty"><p>tweets.json を読み込めませんでした。</p><p class="small">index.html と同じフォルダに tweets.json を置き、サーバー経由で開いてください（ファイルを直接開くと読み込めません）。</p></div>`;
+});
+</script>
+</body>
+</html>
